@@ -56,17 +56,36 @@ module.exports = {
       copyrightYear: siteData.year
     });
   },
+  // commenting out original login_post method to update to newest method noted in 5-0 demo
+  // login_post: (request, response) => {
+  //   const {username, password} = request.body;
+  //   User.findOne({username: username}, (error, foundUser) => {
+  //     if (error) {
+  //       console.log(`The error at login is: ${error}`);
+  //     } else {
+  //       passport.authenticate('local')(request, response, () => {
+  //         response.redirect('/admin')
+  //       })
+  //     };
+  //   })
+  // },
   login_post: (request, response) => {
     const {username, password} = request.body;
-    User.findOne({username: username}, (error, foundUser) => {
+    const user = new User({
+      username: username,
+      password: password
+    });
+
+    request.login(user, (error) => {
       if (error) {
-        console.log(`The error at login is: ${error}`);
+        console.log(error)
+        response.redirect('/login');
       } else {
         passport.authenticate('local')(request, response, () => {
-          response.redirect('/admin')
-        })
-      };
-    })
+          response.redirect('/admin');
+        });
+      }
+    });
   },
     // older method of authenticating logging in user with bcrypt to match salted/hashed passwords, above is the newer authentication method of using passport
     /* const {username, password} = request.body;
